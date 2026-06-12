@@ -5,7 +5,7 @@ import java.util.Random;
 public class Numbers 
 {
 	// data
-	private int randomNum;
+	private static int randomNum;
 	
 	// setter 
 	public void setRandomNum(int num)
