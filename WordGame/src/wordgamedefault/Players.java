@@ -35,7 +35,7 @@ public class Players extends Person{
 	public String toString()
 	{
 		return "Player's name: " + getFirstName() + " " + getLastName() + "\n"
-				+ "Current Amount of Money: " + getCurrentMoney();
+				+ "Current Amount of Money: $" + getCurrentMoney();
 	}
 
 }
