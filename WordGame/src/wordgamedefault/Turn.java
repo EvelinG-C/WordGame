@@ -5,17 +5,17 @@ import java.util.Scanner;
 
 public class Turn {
 	
-	public Boolean takeTurn(Players player, Hosts host, Scanner input)
+	public Boolean takeTurn(Players player, Hosts host, Scanner input, Phrases phrase) 
 	{
-		Numbers num = new Numbers();
 		Random randNum = new Random();
 		Money money = new Money();
 		Physical phys = new Physical();
 		
-		int guess;
+		String guessLetter;
 		int giftNumber;
 		
 		System.out.println("----------------------------------");
+		System.out.println("'Here is the myterious word:' " + phrase.getPlayingPhrase());
 		
 		giftNumber = randNum.nextInt(0,2);
 		
@@ -28,17 +28,34 @@ public class Turn {
 			System.out.println(player.getFirstName() + ", 'You are trying to win a gift!'");
 		}
 		
-		System.out.print(host.getFirstName() + " says 'Enter a number between 0 and 100:' ");
+		phrase.getPlayingPhrase();
+
+		System.out.print(host.getFirstName() + " says 'Enter a letter:' ");
 		
-		while(!input.hasNextInt())
+		guessLetter = input.next();
+		
+		while (guessLetter.length() != 1 || !Character.isLetter(guessLetter.charAt(0)))
 		{
-			System.out.print(host.getFirstName() + " says 'Please insert a number:' ");
-			input.next();
+			System.out.print("'Please enter one letter:' ");
+			guessLetter = input.next();
 		}
 		
-		guess = input.nextInt();
+		try {
+			phrase.findLetters(guessLetter);
+		} catch (MultipleLettersException e) {
+			System.out.println(e);
+		}
 		
-		Boolean trueOrFalse = num.compareNumber(guess);
+		boolean trueOrFalse;
+		
+		if (!phrase.getPlayingPhrase().contains("_"))
+		{
+			trueOrFalse = true;
+		}
+		else
+		{
+			trueOrFalse = false;
+		}
 		
 		if (giftNumber == 0)
 		{
@@ -47,6 +64,8 @@ public class Turn {
 			player.setCurrentMoney(player.getCurrentMoney() + newAmount);
 			
 			System.out.println(player.toString());
+			
+			System.out.println("Current Progress: " + phrase.getPlayingPhrase());
 			
 			System.out.println();
 		}
@@ -57,6 +76,8 @@ public class Turn {
 			player.setCurrentMoney(player.getCurrentMoney() + newAmount);
 			
 			System.out.println(player.toString());
+			
+			System.out.println("Current Progress: " + phrase.getPlayingPhrase());
 			
 			System.out.println();
 		}
