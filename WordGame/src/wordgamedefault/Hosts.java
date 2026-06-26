@@ -1,5 +1,7 @@
 package wordgamedefault;
 
+import java.util.Scanner;
+
 public class Hosts extends Person{
 	
 	// Constructors
@@ -13,11 +15,26 @@ public class Hosts extends Person{
 		super(firstName, lastName);
 	}
 	
-	// This method accesses the Numbers class 
-	// and generates a random number.
-	public void randomizeNum()
+	// Assigns the gamePhrase
+	public void setGamePhrase(String phrase)
 	{
-		Numbers num = new Numbers();
-		num.generateNumber();
+		Phrases.gamePhrase = phrase;
+	}
+	
+	// Method that checks if the player wants to play again
+	public boolean playAgain(Scanner input)
+	{
+		System.out.print(getFirstName() + " says 'Would you like to play again?' (yes or no) ");
+		
+		String playAgain = input.next();
+		
+		if (playAgain.equalsIgnoreCase("yes"))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }
