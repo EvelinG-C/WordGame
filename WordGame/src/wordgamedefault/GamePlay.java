@@ -8,14 +8,39 @@ public class GamePlay {
 
 	public static void main(String[] args) 
 	{
+		Phrases phraseClass = new Phrases();
 		Players[] currentPlayers = new Players[3];
 		
 		Hosts host = new Hosts("Garfield");
-		host.randomizeNum();
+		
+		System.out.println(host.getFirstName() + " says 'I will now set the word for this game'");
+		System.out.print("'Set the phrase with no special characters or digits:' ");
+		Scanner scnr = new Scanner(System.in);
+		
+		// add meaures so that no digits or special characters are added
+		String phrase = scnr.nextLine();
+		
+		boolean hasLettersSpecial = false;
+		
+		while(hasLettersSpecial == false)
+		{
+			if (phrase.matches(".*[^A-Za-z ].*"))
+			{
+				System.out.print("'Please enter a new phrase:' ");
+				phrase = scnr.nextLine();
+			}
+			else
+			{
+				hasLettersSpecial = true;
+			}
+		}
+
+		System.out.println();
+		host.setGamePhrase(phrase);
+		phraseClass.setPlayingPhrase(phrase);
 		
 		System.out.println(host.getFirstName() + " says 'Welcome to the Random Word Game!'");
 		System.out.println();
-		Scanner scnr = new Scanner(System.in);
 		
 		for (int i = 0; i < currentPlayers.length; i++)
 		{
@@ -28,7 +53,7 @@ public class GamePlay {
 			String answer = scnr.next();
 			
 			String lastName;
-			if (answer.toLowerCase().equals("yes"))
+			if (answer.equalsIgnoreCase("yes"))
 			{
 				System.out.print(host.getFirstName() + " says 'What is your last name?' ");
 				lastName = scnr.next();
@@ -60,39 +85,45 @@ public class GamePlay {
 		
 		while (restartGame == true)
 		{
-			Boolean didWin = false;
-			while(didWin == false)
+			boolean didtWin = false;
+			while(didtWin == false)
 			{
 				for (Players person : currentPlayers)
 				{
-					if (didWin == true)
+					if (didtWin == true)
 					{
 						continue;
 					}
-					didWin = turn.takeTurn(person, host, scnr);
+					
+					didtWin = turn.takeTurn(person, host, scnr, phraseClass);
 				}
 			}
 			
 			System.out.println("----------------------------------");
-			System.out.print(host.getFirstName() + " says 'Would you like to restart the game?' (yes or no) ");
-			decision = scnr.next();
-			System.out.println();
-			if (decision.toLowerCase().equals("yes"))
+			
+			restartGame = host.playAgain(scnr);
+			
+			if(restartGame)
 			{
-				host.randomizeNum();
-				restartGame = true;
+				System.out.println(host.getFirstName() + " says 'I will insert the new phrase.'");
+				System.out.print("'The new phrase is:' ");
+				scnr.nextLine();
+				String newPhrase = scnr.nextLine();
+				host.setGamePhrase(newPhrase);
+				phraseClass.setPlayingPhrase(newPhrase);
+				System.out.println();
 			}
 			else
 			{
 				restartGame = false;
+				System.out.println();
 			}
 		}
 		
 		System.out.println("----------------------------------");
 		System.out.println(host.getFirstName() + " says 'Thanks for playing!'");
 		
-		scnr.close();
-
+		scnr.close();	
 	}
 
 }
