@@ -3,8 +3,11 @@ package wordgamedefault;
 import java.util.Random;
 
 public class Physical implements Award{
-	String[] physicalRewards = {"Artbook", "Hawaii Tickets", "Signed Posters", "Hoodie", "Blanket"};
 	
+	private String[] physicalRewards = {"Artbook", "Hawaii Tickets", "Signed Posters", "Hoodie", "Blanket"};
+	private String playerPrize = "";
+	
+	// Method gets a random number that represents a prize
 	public int getRandomPrize()
 	{
 		Random rand = new Random();
@@ -12,22 +15,27 @@ public class Physical implements Award{
 		return randomGift;
 	}
 	
+	// Method gets the playerPrize variable
+	public String getPlayerPrize()
+	{
+		return playerPrize;
+	}
+	
+	// Method displays whether player won a prize or not
 	public int displayWinnings(Players player, Boolean didWin)
 	{
 		if (didWin == true)
 		{
-			System.out.println("'" + player.getFirstName() + ", You have won!'");
 			String reward = physicalRewards[getRandomPrize()];
-			System.out.println("Prize won: " + reward);
-			System.out.println();
+			playerPrize = "You have won!\n" + "Prize won: " + reward + "\n\n";
+			
 			return 0;
 		}
 		else
 		{
-			System.out.println("'" + player.getFirstName() + ", You have lost!'");
 			String reward = physicalRewards[getRandomPrize()];
-			System.out.println("Prize you could have won: " + reward);
-			System.out.println();
+			playerPrize = "You have not won!\n" + "Prize you could have won: " + reward + "\n\n";
+			
 			return 0;
 		}
 	}
