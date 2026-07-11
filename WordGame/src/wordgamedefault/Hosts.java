@@ -1,6 +1,6 @@
 package wordgamedefault;
 
-import java.util.Scanner;
+import javax.swing.JOptionPane;
 
 public class Hosts extends Person{
 	
@@ -22,19 +22,16 @@ public class Hosts extends Person{
 	}
 	
 	// Method that checks if the player wants to play again
-	public boolean playAgain(Scanner input)
+	public boolean playAgain(Boolean didWin)
 	{
-		System.out.print(getFirstName() + " says 'Would you like to play again?' (yes or no) ");
+		int response = GUI.restartPane.showConfirmDialog(null,"Would you like to play again?", "Confirm Option",JOptionPane.YES_NO_OPTION);
 		
-		String playAgain = input.next();
+		if (response != JOptionPane.YES_OPTION)
+		{
+			String thanksString = "Thank you for playing!\n";
+			GUI.dialogueArea1.append(thanksString);
+		}
 		
-		if (playAgain.equalsIgnoreCase("yes"))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return response == JOptionPane.YES_OPTION;
 	}
 }
