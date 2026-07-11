@@ -15,12 +15,12 @@ public class Turn {
 		
 		if (giftNumber == 0)
 		{
-			String giftStat = player.getFirstName() + ", 'You are trying to win money!'\n";
+			String giftStat = player.getFirstName() + ", You are trying to win money!\n\n";
 			GUI.dialogueArea1.append(giftStat);
 		}
 		else
 		{
-			String giftStat = player.getFirstName() + ", 'You are trying to win a gift!'\n";
+			String giftStat = player.getFirstName() + ", You are trying to win a gift!\n\n";
 			GUI.dialogueArea1.append(giftStat);
 		}
 		
@@ -28,7 +28,7 @@ public class Turn {
 		
 		if (letter.length() != 1 || !Character.isLetter(letter.charAt(0)))
 		{
-			String error = "'Please enter one letter. Try Again.'\n\n";
+			String error = "Please enter one letter. Try Again.\n\n";
 			GUI.dialogueArea1.append(error);
 			
 			return false;
