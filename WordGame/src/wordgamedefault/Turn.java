@@ -1,87 +1,83 @@
 package wordgamedefault;
 
 import java.util.Random;
-import java.util.Scanner;
 
 public class Turn {
-	
-	public Boolean takeTurn(Players player, Hosts host, Scanner input, Phrases phrase) 
+	public Boolean takeTurn(Players player, Hosts host, String letter, Phrases phrase) 
 	{
 		Random randNum = new Random();
 		Money money = new Money();
 		Physical phys = new Physical();
 		
-		String guessLetter;
 		int giftNumber;
-		
-		System.out.println("----------------------------------");
-		System.out.println("'Here is the myterious word:' " + phrase.getPlayingPhrase());
-		
 		giftNumber = randNum.nextInt(0,2);
+		String ogPlayingPhrase = phrase.getPlayingPhrase();
 		
 		if (giftNumber == 0)
 		{
-			System.out.println(player.getFirstName() + ", 'You are trying to win money!'");
+			String giftStat = player.getFirstName() + ", 'You are trying to win money!'\n";
+			GUI.dialogueArea1.append(giftStat);
 		}
 		else
 		{
-			System.out.println(player.getFirstName() + ", 'You are trying to win a gift!'");
+			String giftStat = player.getFirstName() + ", 'You are trying to win a gift!'\n";
+			GUI.dialogueArea1.append(giftStat);
 		}
 		
 		phrase.getPlayingPhrase();
-
-		System.out.print(host.getFirstName() + " says 'Enter a letter:' ");
 		
-		guessLetter = input.next();
-		
-		while (guessLetter.length() != 1 || !Character.isLetter(guessLetter.charAt(0)))
+		if (letter.length() != 1 || !Character.isLetter(letter.charAt(0)))
 		{
-			System.out.print("'Please enter one letter:' ");
-			guessLetter = input.next();
+			String error = "'Please enter one letter. Try Again.'\n\n";
+			GUI.dialogueArea1.append(error);
+			
+			return false;
 		}
 		
 		try {
-			phrase.findLetters(guessLetter);
+			phrase.findLetters(letter);
 		} catch (MultipleLettersException e) {
 			System.out.println(e);
 		}
 		
-		boolean trueOrFalse;
+		boolean wonGame;
 		
 		if (!phrase.getPlayingPhrase().contains("_"))
 		{
-			trueOrFalse = true;
+			wonGame = true;
 		}
 		else
 		{
-			trueOrFalse = false;
+			wonGame = false;
 		}
 		
+		boolean guessedCorrect = true;
+		if (ogPlayingPhrase.equals(phrase.getPlayingPhrase()))
+		{
+			guessedCorrect = false;
+		}
+		
+		// 0 means money
 		if (giftNumber == 0)
 		{
-			int newAmount = money.displayWinnings(player, trueOrFalse);
-			
+			int newAmount = money.displayWinnings(player, guessedCorrect);
 			player.setCurrentMoney(player.getCurrentMoney() + newAmount);
+			String playerInfo1 = player.toString() + money.getPlayerInfo();
 			
-			System.out.println(player.toString());
-			
-			System.out.println("Current Progress: " + phrase.getPlayingPhrase());
-			
-			System.out.println();
+			GUI.dialogueArea1.append(playerInfo1);
+			GUI.infoPane.showConfirmDialog(null, playerInfo1);
 		}
+		// 1 means gift
 		else if (giftNumber == 1)
 		{
-			int newAmount = phys.displayWinnings(player, trueOrFalse);
-	
+			int newAmount = phys.displayWinnings(player, wonGame);
 			player.setCurrentMoney(player.getCurrentMoney() + newAmount);
+			String playerInfo1 = player.toString() + phys.getPlayerPrize();
 			
-			System.out.println(player.toString());
-			
-			System.out.println("Current Progress: " + phrase.getPlayingPhrase());
-			
-			System.out.println();
+			GUI.dialogueArea1.append(playerInfo1);
+			GUI.infoPane.showConfirmDialog(null, playerInfo1);
 		}
 		
-		return trueOrFalse;
+		return wonGame;
 	}
 }
