@@ -46,7 +46,7 @@ public class Phrases
 	// and throws the MultipleLettersException
 	public void findLetters(String letter) 
 			throws MultipleLettersException
-	{
+	{	
 		// gets the length of the string
 		int wordLength = letter.length();
 		
