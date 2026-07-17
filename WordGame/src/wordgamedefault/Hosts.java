@@ -29,7 +29,7 @@ public class Hosts extends Person{
 		if (response != JOptionPane.YES_OPTION)
 		{
 			String thanksString = "Thank you for playing!\n";
-			GUI.dialogueArea1.append(thanksString);
+			GUI.dialogueArea.append(thanksString);
 		}
 		
 		return response == JOptionPane.YES_OPTION;

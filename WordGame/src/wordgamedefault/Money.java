@@ -17,7 +17,7 @@ public class Money implements Award{
 	public int displayWinnings(Players player, Boolean correct) {
 		if (correct == true)
 		{
-			playerInfo = "You have guessed right!\n " 
+			playerInfo = "You have guessed right!\n" 
 							+ "You have gained $15\n\n";
 			
 			return incAmount;

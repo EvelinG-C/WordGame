@@ -15,13 +15,13 @@ public class Turn {
 		
 		if (giftNumber == 0)
 		{
-			String giftStat = player.getFirstName() + ", You are trying to win money!\n\n";
-			GUI.dialogueArea1.append(giftStat);
+			String giftStat = player.getFirstName() + ", You are trying to win money!\n";
+			GUI.dialogueArea.append(giftStat);
 		}
 		else
 		{
-			String giftStat = player.getFirstName() + ", You are trying to win a gift!\n\n";
-			GUI.dialogueArea1.append(giftStat);
+			String giftStat = player.getFirstName() + ", You are trying to win a gift!\n";
+			GUI.dialogueArea.append(giftStat);
 		}
 		
 		phrase.getPlayingPhrase();
@@ -29,7 +29,7 @@ public class Turn {
 		if (letter.length() != 1 || !Character.isLetter(letter.charAt(0)))
 		{
 			String error = "Please enter one letter. Try Again.\n\n";
-			GUI.dialogueArea1.append(error);
+			GUI.dialogueArea.append(error);
 			
 			return false;
 		}
@@ -64,8 +64,7 @@ public class Turn {
 			player.setCurrentMoney(player.getCurrentMoney() + newAmount);
 			String playerInfo1 = player.toString() + money.getPlayerInfo();
 			
-			GUI.dialogueArea1.append(playerInfo1);
-			GUI.infoPane.showConfirmDialog(null, playerInfo1);
+			GUI.dialogueArea.append(playerInfo1);
 		}
 		// 1 means gift
 		else if (giftNumber == 1)
@@ -74,8 +73,7 @@ public class Turn {
 			player.setCurrentMoney(player.getCurrentMoney() + newAmount);
 			String playerInfo1 = player.toString() + phys.getPlayerPrize();
 			
-			GUI.dialogueArea1.append(playerInfo1);
-			GUI.infoPane.showConfirmDialog(null, playerInfo1);
+			GUI.dialogueArea.append(playerInfo1);
 		}
 		
 		return wonGame;
