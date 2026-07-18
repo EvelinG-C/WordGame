@@ -2,16 +2,12 @@ package wordgamedefault;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 public class GUI
 {
@@ -22,20 +18,28 @@ public class GUI
 	private JLabel playerLabel = new JLabel("Player List:");
 	private JLabel hostNameLabel = new JLabel("Host Name:");
 	private JLabel playingPhrase = new JLabel();
-	private JButton newPlayerButton = new JButton("New Player!");
-	private JButton hostNameButton = new JButton("New Host!");
 	private JButton startPlayingButton = new JButton("Start");
 	private JButton submitButton = new JButton("Submit");
-	static public JTextArea dialogueArea1 = new JTextArea(13,20);
+	static public JTextArea dialogueArea = new JTextArea(13,20);
 	private JTextField letterTextField = new JTextField(10);
-	private JScrollPane scrollPane = new JScrollPane(dialogueArea1);
+	private JScrollPane scrollPane = new JScrollPane(dialogueArea);
 	static public JOptionPane infoPane = new JOptionPane();
 	static public JOptionPane restartPane = new JOptionPane();
 	static public JOptionPane newPhrase = new JOptionPane();
+	private JOptionPane layoutPane = new JOptionPane();
 	private JPanel playerPanel = new JPanel();
-	private JPanel hostPanel = new JPanel();
+	private JPanel wordPanel = new JPanel();
 	private JPanel dialoguePanel = new JPanel();
 	private JPanel textPanel = new JPanel();
+	private JCheckBox saveCheckBox = new JCheckBox("Save messages.");
+	
+	// Creating Menu Bar
+	private JMenuBar menuBar = new JMenuBar();
+	private JMenu gameMenu = new JMenu("Game");
+	private JMenuItem addPlayerItem = new JMenuItem("Add Player");
+	private JMenuItem addHostItem = new JMenuItem("Add Host");
+	private JMenu aboutMenu = new JMenu("About");
+	private JMenuItem layoutItem = new JMenuItem("Layout");
 	
 	// Object instantiation
 	Phrases phraseClass = new Phrases();
@@ -65,48 +69,89 @@ public class GUI
 	// and sets the Action Listeners of each button
 	private void initialize()
 	{
-		wordFrame.setSize(800,500);
+		wordFrame.setSize(500,500);
 		wordFrame.setLayout(new GridLayout(2,2));
 		wordFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		wordFrame.setLocationRelativeTo(null);
 		wordFrame.setResizable(false);
 		
 		wordFrame.add(playerPanel);
-		wordFrame.add(hostPanel);
 		wordFrame.add(dialoguePanel);
 		wordFrame.add(textPanel);
+		wordFrame.add(wordPanel);
 		
 		playerPanel.setBackground(Color.PINK);
-		hostPanel.setBackground(Color.PINK);
+		wordPanel.setBackground(Color.PINK);
 		dialoguePanel.setBackground(Color.PINK);
 		textPanel.setBackground(Color.PINK);
 		
+		playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
+		dialoguePanel.setLayout(new BoxLayout(dialoguePanel, BoxLayout.Y_AXIS));
+		wordPanel.setLayout(new BorderLayout());
+		textPanel.setLayout(new FlowLayout());
+		
+		wordPanel.setBorder(new EmptyBorder(10,50,10,15));
+		wordPanel.add(playingPhrase, BorderLayout.CENTER);
+		
+		playerPanel.setBorder(new EmptyBorder(10,15,10,15));
 		playerPanel.add(playerLabel);
-		playerPanel.add(newPlayerButton);
-		newPlayerButton.setFocusable(false);
-		
-		hostPanel.add(hostNameLabel);
-		hostPanel.add(hostNameButton, BorderLayout.SOUTH);
-		hostNameButton.setFocusable(false);
+		playerPanel.add(Box.createVerticalStrut(15));
+		playerPanel.add(hostNameLabel);
+		playerPanel.add(Box.createVerticalStrut(15));
+		playerPanel.add(startPlayingButton);
+		playerLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
-		dialogueArea1.setLineWrap(true);
-		dialogueArea1.setWrapStyleWord(true);
-		dialogueArea1.setEditable(false);
+		dialogueArea.setLineWrap(true);
+		dialogueArea.setWrapStyleWord(true);
+		dialogueArea.setEditable(false);
 		dialoguePanel.add(scrollPane);
-		dialoguePanel.add(startPlayingButton);
+		dialoguePanel.setBorder(new EmptyBorder(10,15,10,15));
+		dialoguePanel.add(Box.createVerticalStrut(3));
+		dialoguePanel.add(saveCheckBox);
+		saveCheckBox.setToolTipText("Saves the messages in the text area");
 		
-		textPanel.add(playingPhrase);
+		textPanel.setBorder(new EmptyBorder(100,15,10,15));
 		textPanel.add(letterTextField);
 		textPanel.add(submitButton);
 		letterTextField.setEnabled(false);
 		submitButton.setEnabled(false);
 		
+		// Creating the Menu Bar
+		gameMenu.add(addPlayerItem);
+		gameMenu.add(addHostItem);
+		aboutMenu.add(layoutItem);
+		menuBar.add(gameMenu);
+		menuBar.add(aboutMenu);
+		wordFrame.setJMenuBar(menuBar);
+		gameMenu.setMnemonic('G');
+		aboutMenu.setMnemonic('A');
+		
+		// Sets the font for the playing phrase
+		playingPhrase.setFont(new Font("Display", Font.BOLD, 18));
+		
 		// Button Action Events
-		newPlayerButton.addActionListener(e ->{
+		
+		layoutItem.addActionListener(e->{
+			String layoutMessage = "When creating the layout for this GUI, I made sure to have"
+					+ " small frame so that the components wouldn't be far apart and leave a lot of space.\n"
+					+ "I seperated the components in four quadrants, where each has it's own purpose.\n"
+					+ "In the to top left, the names of both the host and players are displayed along with "
+					+ "the start button, so the players can easily start the game.\nIn the top right, "
+					+ "the text area is displayed along with the 'save messages' check box, so that the player "
+					+ "knows that the check box is for the text area.\nIn the bottom right, I put the text field"
+					+ " and submit button together, so the players can know that when they type a letter they use "
+					+ "the submit button and not the start button.\nEven though the bottom left looks empty"
+					+ ", when a phrase is chosen the underlines of the phrase will be displayed there for the "
+					+ "player to look at.";
+			
+			layoutPane.showMessageDialog(wordFrame, layoutMessage);
+		});
+		
+		addPlayerItem.addActionListener(e ->{
 			setNewPlayerButton();
 		});
 		
-		hostNameButton.addActionListener(e ->{
+		addHostItem.addActionListener(e -> {
 			setHostNameButton();
 		});
 		
@@ -144,14 +189,23 @@ public class GUI
 		
 		if (didWin)
 		{
-			infoPane.showMessageDialog(wordFrame, "The winner: " + winnerPlayer.getFirstName() + "\n"
-											+ "Money won: $" + winnerPlayer.getCurrentMoney() + "\n");
+			String winnerMessage = "The winner: " + winnerPlayer.getFirstName() + "\n"
+									+ "Money won: $" + winnerPlayer.getCurrentMoney() + "\n";
+			
+			dialogueArea.append(winnerMessage);
+			
+			infoPane.showMessageDialog(wordFrame, winnerMessage);
 			
 			submitButton.setEnabled(false);
 			boolean playAgain = host.playAgain(didWin);
 			if (playAgain)
 			{
 				newPhrase();
+				
+				if (!(saveCheckBox.isSelected()))
+				{
+					dialogueArea.setText("");
+				}
 				
 				didWin = false;
 				letterTextField.setText("");
@@ -181,7 +235,7 @@ public class GUI
 		letterTextField.setEnabled(true);
 		submitButton.setEnabled(true);
 		startPlayingButton.setEnabled(false);
-		newPlayerButton.setEnabled(false);
+		addPlayerItem.setEnabled(false);
 	}
 	
 	// Displays the host's name in the frame
@@ -207,8 +261,7 @@ public class GUI
 		
 		if (clickCount >= MAX_CLICKS)
 		{
-			newPlayerButton.setEnabled(false);
-			newPlayerButton.setText("No More Players.");
+			addPlayerItem.setEnabled(false);
 		}
 	}
 	
@@ -289,8 +342,7 @@ public class GUI
 				host.setGamePhrase(phrase);
 				phraseClass.setPlayingPhrase(phrase);
 				playingPhrase.setText(phraseClass.getPlayingPhrase());
-				hostNameButton.setEnabled(false);
-				hostNameButton.setText("Host & phrase added!");
+				addHostItem.setEnabled(false);
 				
 				return true;
 			}
