@@ -4,8 +4,9 @@ import java.util.Random;
 
 public class Physical implements Award{
 	
-	private String[] physicalRewards = {"Artbook", "Hawaii Tickets", "Signed Posters", "Hoodie", "Blanket"};
-	private String playerPrize = "";
+	private String[] physicalRewards = {"Artbook", "Hawaii Tickets", "Dictionary", "Hoodie", "Blanket"};
+	private String prizeMessage = "";
+	private String physicalReward;
 	
 	// Method gets a random number that represents a prize
 	public int getRandomPrize()
@@ -15,10 +16,22 @@ public class Physical implements Award{
 		return randomGift;
 	}
 	
-	// Method gets the playerPrize variable
-	public String getPlayerPrize()
+	// Method gets the prizeMessage variable
+	public String getPrizeMessage()
 	{
-		return playerPrize;
+		return prizeMessage;
+	}
+	
+	// Method gets the physicalReward variable
+	public String getPhysicalReward()
+	{
+		return physicalReward;
+	}
+	
+	// Method sets the physicalReward variable to "none"
+	public void setEmptyReward()
+	{
+		physicalReward = "none";
 	}
 	
 	// Method displays whether player won a prize or not
@@ -26,15 +39,16 @@ public class Physical implements Award{
 	{
 		if (didWin == true)
 		{
-			String reward = physicalRewards[getRandomPrize()];
-			playerPrize = "You have won!\n" + "Prize won: " + reward + "\n\n";
+			physicalReward = physicalRewards[getRandomPrize()];
+			prizeMessage = "You have guessed right!\n" + "Prize won: " + physicalReward + "\n\n";
 			
 			return 0;
 		}
 		else
 		{
-			String reward = physicalRewards[getRandomPrize()];
-			playerPrize = "You have not won!\n" + "Prize you could have won: " + reward + "\n\n";
+			physicalReward = null;
+			String potentialReward = physicalRewards[getRandomPrize()];
+			prizeMessage = "You have guessed wrong!\n" + "Prize you could have won: " + potentialReward + "\n\n";
 			
 			return 0;
 		}
