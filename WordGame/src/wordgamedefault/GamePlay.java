@@ -12,7 +12,7 @@ public class GamePlay {
 			@Override
 			public void run() {
 				GUI main = new GUI();
-				main.show();
+				main.showGUI();
 			}
 		});
 	}
