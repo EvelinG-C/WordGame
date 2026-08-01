@@ -5,11 +5,21 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-public class GUI
+public class GUI extends JFrame
 {
 	/* DATA */
 	
@@ -18,6 +28,7 @@ public class GUI
 	private JLabel playerLabel = new JLabel("Player List:");
 	private JLabel hostNameLabel = new JLabel("Host Name:");
 	private JLabel playingPhrase = new JLabel();
+	private JLabel prizesWonLabel = new JLabel("Prizes Won:");
 	private JButton startPlayingButton = new JButton("Start");
 	private JButton submitButton = new JButton("Submit");
 	static public JTextArea dialogueArea = new JTextArea(13,20);
@@ -26,11 +37,13 @@ public class GUI
 	static public JOptionPane infoPane = new JOptionPane();
 	static public JOptionPane restartPane = new JOptionPane();
 	static public JOptionPane newPhrase = new JOptionPane();
-	private JOptionPane layoutPane = new JOptionPane();
+	private JOptionPane aboutPane = new JOptionPane();
 	private JPanel playerPanel = new JPanel();
 	private JPanel wordPanel = new JPanel();
 	private JPanel dialoguePanel = new JPanel();
 	private JPanel textPanel = new JPanel();
+	private JPanel prizePanel = new JPanel();
+	private JPanel animationPanel = new JPanel();
 	private JCheckBox saveCheckBox = new JCheckBox("Save messages.");
 	
 	// Creating Menu Bar
@@ -40,13 +53,21 @@ public class GUI
 	private JMenuItem addHostItem = new JMenuItem("Add Host");
 	private JMenu aboutMenu = new JMenu("About");
 	private JMenuItem layoutItem = new JMenuItem("Layout");
+	private JMenu attributionItem = new JMenu("Attribution");
+	private JMenuItem visualSubItem = new JMenuItem("Visuals");
+	private JMenuItem audioSubItem = new JMenuItem("Audio");
+	
+	// Adding Prize Images
+	ImageIcon imageIcon;
 	
 	// Object instantiation
 	Phrases phraseClass = new Phrases();
 	Players[] currentPlayers = new Players[3];
 	Hosts host;
-	Turn turn = new Turn();
 	Physical physical = new Physical();
+	Turn turn = new Turn(physical);
+	Clip clip;
+	Circle circlePanel = new Circle();
 	
 	// Variables
 	String letter = "";
@@ -69,26 +90,32 @@ public class GUI
 	// and sets the Action Listeners of each button
 	private void initialize()
 	{
-		wordFrame.setSize(500,500);
-		wordFrame.setLayout(new GridLayout(2,2));
-		wordFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		wordFrame.setSize(900,500);
+		wordFrame.setLayout(new GridLayout(2,3));
+		wordFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		wordFrame.setLocationRelativeTo(null);
 		wordFrame.setResizable(false);
 		
 		wordFrame.add(playerPanel);
 		wordFrame.add(dialoguePanel);
+		wordFrame.add(prizePanel);
 		wordFrame.add(textPanel);
 		wordFrame.add(wordPanel);
+		wordFrame.add(circlePanel);
 		
 		playerPanel.setBackground(Color.PINK);
 		wordPanel.setBackground(Color.PINK);
 		dialoguePanel.setBackground(Color.PINK);
 		textPanel.setBackground(Color.PINK);
+		prizePanel.setBackground(Color.PINK);
+		animationPanel.setBackground(Color.PINK);
 		
 		playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
 		dialoguePanel.setLayout(new BoxLayout(dialoguePanel, BoxLayout.Y_AXIS));
 		wordPanel.setLayout(new BorderLayout());
 		textPanel.setLayout(new FlowLayout());
+		
+		prizePanel.add(prizesWonLabel);
 		
 		wordPanel.setBorder(new EmptyBorder(10,50,10,15));
 		wordPanel.add(playingPhrase, BorderLayout.CENTER);
@@ -116,10 +143,14 @@ public class GUI
 		letterTextField.setEnabled(false);
 		submitButton.setEnabled(false);
 		
-		// Creating the Menu Bar
+		// Creating the Menu Bar 
+		attributionItem.add(visualSubItem);
+		attributionItem.add(audioSubItem);
 		gameMenu.add(addPlayerItem);
 		gameMenu.add(addHostItem);
 		aboutMenu.add(layoutItem);
+		aboutMenu.addSeparator();
+		aboutMenu.add(attributionItem);
 		menuBar.add(gameMenu);
 		menuBar.add(aboutMenu);
 		wordFrame.setJMenuBar(menuBar);
@@ -129,7 +160,42 @@ public class GUI
 		// Sets the font for the playing phrase
 		playingPhrase.setFont(new Font("Display", Font.BOLD, 18));
 		
-		// Button Action Events
+		// Action Listener events
+		visualSubItem.addActionListener(e ->{
+			String visualAttributionMessage = 
+					"Artbook - \r\n"
+					+ "Image by <a href=\"https://pixabay.com/users/jkoets-13686196/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8716431\">\n"
+					+ "jkoets</a> from <a href=\"https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8716431\">Pixabay</a>\r\n"
+					+ "\r\n"
+					+ "Tickets - \r\n"
+					+ "Image by <a href=\"https://pixabay.com/users/barelydevi-14723734/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=5957841\n"
+					+ "\">BarelyDevi</a> from <a href=\"https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=5957841\">Pixabay</a>\r\n"
+					+ "\r\n"
+					+ "Dictionary -\r\n"
+					+ "Image by <a href=\"https://pixabay.com/users/openclipart-vectors-30363/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=155951\n"
+					+ "\">OpenClipart-Vectors</a> from <a href=\"https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=155951\">Pixabay</a>\r\n"
+					+ "\r\n"
+					+ "Blanket - \r\n"
+					+ "Photo by <a href=\"https://unsplash.com/@jordanbigs?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText\">Jordan Bigelow</a> on \n"
+					+ "<a href=\"https://unsplash.com/photos/white-and-blue-knit-textile-53BjYSxca5g?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText\">Unsplash</a>\r\n"
+					+ "\r\n"
+					+ "Hoodie - \r\n"
+					+ "Photo by <a href=\"https://unsplash.com/@mediamodifier?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText\">Mediamodifier</a> on \n"
+					+ "<a href=\"https://unsplash.com/photos/white-zip-up-jacket-hanging-on-brown-wooden-clothes-hanger-kJXGTOY1wLQ?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText\">Unsplash</a>\r\n"
+					+ "";
+			
+			aboutPane.showMessageDialog(wordFrame, visualAttributionMessage);
+		});
+		
+		audioSubItem.addActionListener(e -> {
+			String audioAttributionMessage = "Background Music -\r\n"
+					+ "Music by Amit Katzengold https://artlist.io/royalty-free-music/song/pass-the-mayo/134756 from \n"
+					+ "Artlist.io https://artlist.io/?utm_source=google&utm_medium=cpc&utm_campaign=23890389036&utm_\n"
+					+ "content=200762436687&ad=811234562597&matchtype=a&device=c&gad_source=1&gad_campaignid=23890389036&gclid=\n"
+					+ "CjwKCAjwyabTBhBFEiwAM3mNUNpCMKVFC215AP2J1UDbS-ZqsMQBOKVd1FZUYC37ikmrtSvfYEruJBoCfecQAvD_BwE\n";
+			
+			aboutPane.showMessageDialog(wordFrame, audioAttributionMessage);
+		});
 		
 		layoutItem.addActionListener(e->{
 			String layoutMessage = "When creating the layout for this GUI, I made sure to have"
@@ -144,7 +210,13 @@ public class GUI
 					+ ", when a phrase is chosen the underlines of the phrase will be displayed there for the "
 					+ "player to look at.";
 			
-			layoutPane.showMessageDialog(wordFrame, layoutMessage);
+			aboutPane.showMessageDialog(wordFrame, layoutMessage);
+		});
+		
+		attributionItem.addActionListener(e -> {
+			String attributionMessage = " jello!";
+			
+			aboutPane.showMessageDialog(wordFrame, attributionMessage);
 		});
 		
 		addPlayerItem.addActionListener(e ->{
@@ -164,6 +236,19 @@ public class GUI
 		{
 			setSubmitButtonAction();
 		});
+		
+		wordFrame.addWindowListener(new WindowAdapter()
+		{
+			@Override
+			public void windowClosing(WindowEvent e)
+			{
+				if (clip != null)
+				{
+					clip.stop();
+					clip.close();
+				}
+			}
+		});
 	}
 	
 	//BUTTON ACTION METHODS
@@ -178,8 +263,13 @@ public class GUI
 		currPlayer = currentPlayers[currPlayerNum];
 		winnerPlayer = currPlayer;
 		
-		startGame();
+		if (!(saveCheckBox.isSelected()))
+		{
+			dialogueArea.setText("");
+		}
 		
+		startGame();
+	
 		currPlayerNum++;
 		
 		if (currPlayerNum >= clickCount)
@@ -197,20 +287,23 @@ public class GUI
 			infoPane.showMessageDialog(wordFrame, winnerMessage);
 			
 			submitButton.setEnabled(false);
+			
 			boolean playAgain = host.playAgain(didWin);
+			
 			if (playAgain)
 			{
 				newPhrase();
 				
-				if (!(saveCheckBox.isSelected()))
-				{
-					dialogueArea.setText("");
-				}
-				
 				didWin = false;
+				dialogueArea.setText("");
 				letterTextField.setText("");
 				submitButton.setEnabled(true);
 				startPlayingButton.setEnabled(false);
+				physical.setEmptyReward();
+				prizePanel.removeAll();
+				prizePanel.add(prizesWonLabel); // keep the title
+				prizePanel.revalidate();
+				prizePanel.repaint();
 			}
 		}
 	}
@@ -265,8 +358,86 @@ public class GUI
 		}
 	}
 	
-	
 	// GAME SET UP METHODS
+	
+	// Method starts and loops an audio
+	public void startAudio()
+	{
+		try 
+		{
+			if (clip == null)
+			{
+				File audioFile = new File("src\\Amit Katzengold - Pass the Mayo.wav");
+				AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+				clip = AudioSystem.getClip();
+				clip.open(audioStream);
+				clip.setFramePosition(0);
+				clip.loop(Clip.LOOP_CONTINUOUSLY);
+			}
+			else
+			{
+				clip.setFramePosition(0);
+				clip.loop(Clip.LOOP_CONTINUOUSLY);
+			}
+		}
+		catch (UnsupportedAudioFileException e) {
+            System.out.println("Error: This audio format is not supported.");
+        } catch (LineUnavailableException e) {
+            System.out.println("Error: Audio line is unavailable.");
+        } catch (IOException e) {
+            System.out.println("Error: File could not be read.");
+        }
+	}
+	
+	// Method displays the physical prizes on the GUI
+	public void displayPhysicalPrize()
+	{
+		int scaleSize = 50;
+		
+		if ("Artbook".equals(physical.getPhysicalReward()))
+		{
+			Image img = new ImageIcon("src/artbook.png").getImage();
+			Image scaled = img.getScaledInstance(scaleSize, scaleSize, Image.SCALE_SMOOTH);
+			
+			JLabel label = new JLabel(new ImageIcon(scaled));
+			prizePanel.add(label);
+		}
+		else if ("Hawaii Tickets".equals(physical.getPhysicalReward()))
+		{
+			Image img = new ImageIcon("src/ticket.png").getImage();
+			Image scaled = img.getScaledInstance(scaleSize, scaleSize, Image.SCALE_SMOOTH);
+			
+			JLabel label = new JLabel(new ImageIcon(scaled));
+			prizePanel.add(label);
+		}
+		else if ("Dictionary".equals(physical.getPhysicalReward()))
+		{
+			Image img = new ImageIcon("src/dictionary.png").getImage();
+			Image scaled = img.getScaledInstance(scaleSize, scaleSize, Image.SCALE_SMOOTH);
+			
+			JLabel label = new JLabel(new ImageIcon(scaled));
+			prizePanel.add(label);
+		}
+		else if ("Hoodie".equals(physical.getPhysicalReward()))
+		{
+			Image img = new ImageIcon("src/hoodie.jpg").getImage();
+			Image scaled = img.getScaledInstance(scaleSize, scaleSize, Image.SCALE_SMOOTH);
+			
+			JLabel label = new JLabel(new ImageIcon(scaled));
+			prizePanel.add(label);
+		}
+		else if ("Blanket".equals(physical.getPhysicalReward()))
+		{
+			Image img = new ImageIcon("src/blanket.jpg").getImage();
+			Image scaled = img.getScaledInstance(scaleSize, scaleSize, Image.SCALE_SMOOTH);
+			
+			JLabel label = new JLabel(new ImageIcon(scaled));
+			prizePanel.add(label);
+		}
+		
+		 prizePanel.revalidate();
+		 prizePanel.repaint();
+	}
 	
 	// Method sets the player's name and displays it in the frame
 	public void getPlayersName(int playerNum)
@@ -278,8 +449,8 @@ public class GUI
 			
 			JComponent[] nameInputs = new JComponent[]
 			{
-				new JLabel("What is your first Name?  "), firstNameField,
-				new JLabel("What is your lastName? "), lastNameField
+				new JLabel("What is your first name?  "), firstNameField,
+				new JLabel("What is your last name? "), lastNameField
 					
 			};
 			
@@ -332,7 +503,6 @@ public class GUI
 				return false;
 			}
 			
-
 			String hostName = hostNameField.getText();
 			String phrase = phraseField.getText();
 			
@@ -381,12 +551,18 @@ public class GUI
 	{
 		didWin = turn.takeTurn(currPlayer, host, letter, phraseClass);
 		playingPhrase.setText(phraseClass.getPlayingPhrase());
+		
+		if ((physical.getPhysicalReward() != null || physical.getPhysicalReward() != "none") && Turn.prizeGuessedCorrect == true)
+		{
+			displayPhysicalPrize();
+		}
 	}
 	
-	// Method displays the frame
-	public void show()
+	// Method displays the frame and starts the background music
+	public void showGUI()
 	{
 		wordFrame.setVisible(true);
+		startAudio();
 	}
 	
 }
